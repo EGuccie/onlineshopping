@@ -1,7 +1,6 @@
 package net.kzn.onlineshopping.controller;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -165,8 +164,7 @@ public class PageController {
 	
 	@RequestMapping(value="/logout")
 	public String logout(HttpServletRequest request, HttpServletResponse response) {
-		// Invalidates HTTP Session, then unbinds any objects bound to it.
-	    // Removes the authentication from securitycontext 		
+	
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 	    if (auth != null){    
 	        new SecurityContextLogoutHandler().logout(request, response, auth);

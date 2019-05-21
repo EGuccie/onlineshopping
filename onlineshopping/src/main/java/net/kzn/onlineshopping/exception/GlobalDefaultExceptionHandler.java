@@ -50,7 +50,6 @@ public class GlobalDefaultExceptionHandler {
 		mv.addObject("errorTitle", "Contact Your Administrator!!");
 		
 		
-		/* only for debugging your application*/
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
 		
