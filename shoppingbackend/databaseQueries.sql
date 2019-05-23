@@ -8,6 +8,19 @@ CREATE TABLE category (
 
 );
 
+CREATE TABLE supplier (
+	id IDENTITY,
+	code VARCHAR(20),
+	company VARCHAR(50),
+	address VARCHAR(50),
+    number INT,
+    email VARCHAR(30),
+	is_active BOOLEAN,
+	supplier_id INT,
+	
+	CONSTRAINT fk_company_supplier_id FOREIGN KEY (supplier_id) REFERENCES user_detail(id),	
+);	
+
 CREATE TABLE user_detail (
 	id IDENTITY,
 	first_name VARCHAR(50),

@@ -18,7 +18,15 @@ $(function() {
 		});				
 	}
 	
-	
+	//dismissing the alert after 3 seconds
+	var $alert=$('alert');
+	if($alert.length){
+		
+		setTimeout(function(){
+			$alert.fadeOut('slow');
+		},3000)
+		
+	}
 	
 	// solving the active menu problem
 	switch (menu) {
@@ -34,6 +42,9 @@ $(function() {
 		break;
 	case 'Product Management':
 		$('#manageProduct').addClass('active');
+		break;
+	case 'Supplier Mnagement':
+		$('#manageSupplier').addClass('active');
 		break;
 	case 'Shopping Cart':
 		$('#userModel').addClass('active');
@@ -92,7 +103,7 @@ $(function() {
 							{
 								data : 'unitPrice',
 								mRender : function(data, type, row) {
-									return '&#8377; ' + data
+									return '&#36; ' + data
 								}
 							},
 							{
@@ -199,7 +210,7 @@ $(function() {
 								{
 									data : 'unitPrice',
 									mRender : function(data, type, row) {
-										return '&#8377; ' + data
+										return '&#36; ' + data
 									}
 								},
 								{
@@ -271,6 +282,124 @@ $(function() {
 					}
 				});
 	}
+	
+	
+	
+	
+	// list of all supplier for admin
+	var $supplierTable = $('#supplierTable');
+	
+	
+	if($productsTable.length) {
+		
+		var jsonUrl = window.contextRoot + '/json/data/admin/manage/supplier';
+		console.log(jsonUrl);
+		
+		$supplierTable.DataTable({
+					lengthMenu : [ [ 10, 30, 50, -1 ], [ '10 Records', '30 Records', '50 Records', 'ALL' ] ],
+					pageLength : 30,
+					ajax : {
+						url : jsonUrl,
+						dataSrc : ''
+					},
+					columns : [		
+					           	{data: 'id'},
+
+
+					           	{data: 'code',
+					           	 bSortable: false,
+					           		mRender: function(data,type,row) {
+					           			return '<img src="' + window.contextRoot
+										+ '/resources/images/' + data
+										+ '.jpg" class="dataTableImg"/>';					           			
+					           		}
+					           	},
+					           	{
+									data : 'company'
+								},
+								{
+									data : 'address'
+								},
+								
+								{
+									data : 'number'
+									
+								},
+								{
+									data : 'email'
+									
+								},
+								{
+									data : 'active',
+									bSortable : false,
+									mRender : function(data, type, row) {
+										var str = '';
+										if(data) {											
+											str += '<label class="switch"> <input type="checkbox" value="'+row.id+'" checked="checked">  <div class="slider round"> </div></label>';
+											
+										}else {
+											str += '<label class="switch"> <input type="checkbox" value="'+row.id+'">  <div class="slider round"> </div></label>';
+										}
+										
+										return str;
+									}
+								},
+								{
+									data : 'id',
+									bSortable : false,
+									mRender : function(data, type, row) {
+
+										var str = '';
+										str += '<a href="'
+												+ window.contextRoot
+												+ '/manage/'
+												+ data
+												+ '/supplier" class="btn btn-primary"><span class="glyphicon glyphicon-pencil"></span></a> &#160;';
+
+										return str;
+									}
+								}					           	
+					],
+					
+					
+					initComplete: function () {
+						var api = this.api();
+						api.$('.switch input[type="checkbox"]').on('change' , function() {							
+							var dText = (this.checked)? 'You want to activate the Supplier?': 'You want to de-activate the Supplier?';
+							var checked = this.checked;
+							var checkbox = $(this);
+							debugger;
+						    bootbox.confirm({
+						    	size: 'medium',
+						    	title: 'Supplier Activation/Deactivation',
+						    	message: dText,
+						    	callback: function (confirmed) {
+							        if (confirmed) {
+							            $.ajax({							            	
+							            	type: 'GET',
+							            	url: window.contextRoot + '/manage/supplier/'+checkbox.prop('value')+'/activation',
+							        		timeout : 100000,
+							        		success : function(data) {
+							        			bootbox.alert(data);							        										        			
+							        		},
+							        		error : function(e) {
+							        			bootbox.alert('ERROR: '+ e);
+							        			//display(e);
+							        		}						            	
+							            });
+							        }
+							        else {							        	
+							        	checkbox.prop('checked', !checked);
+							        }
+						    	}
+						    });																											
+						});
+							
+					}
+				});
+	}
+	
+	
 	
 	
 	
@@ -412,3 +541,6 @@ $(function() {
 		}
 	});			
 });
+
+
+

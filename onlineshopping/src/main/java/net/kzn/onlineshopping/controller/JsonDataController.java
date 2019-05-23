@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import net.kzn.shoppingbackend.dao.ProductDAO;
+import net.kzn.shoppingbackend.dao.SupplierDAO;
 import net.kzn.shoppingbackend.dto.Product;
+import net.kzn.shoppingbackend.dto.Supplier;
 
 @Controller
 @RequestMapping("/json/data")
@@ -18,11 +20,20 @@ public class JsonDataController {
 	@Autowired
 	private ProductDAO productDAO;
 	
+	@Autowired
+	private SupplierDAO supplierDAO;
 
 	@RequestMapping("/admin/all/products")
 	@ResponseBody
 	public List<Product> getAllProductsList() {		
 		return productDAO.list();
+				
+	}	
+	
+	@RequestMapping("/admin/sup/supplier")
+	@ResponseBody
+	public List<Supplier> getAllASupplierList() {		
+		return supplierDAO.list();
 				
 	}	
 	

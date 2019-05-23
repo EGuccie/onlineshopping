@@ -33,6 +33,11 @@
 	                        <a href="${contextRoot}/manage/product">Manage Product</a>
 	                    </li>					
 					</security:authorize>
+					<security:authorize access="hasAuthority('ADMIN')">
+	                    <li id="manageSupplier">
+	                        <a href="${contextRoot}/manage/supplier">Manage Supplier</a>
+	                    </li>					
+					</security:authorize>
                 </ul>
 			    
 			    <ul class="nav navbar-nav navbar-right">

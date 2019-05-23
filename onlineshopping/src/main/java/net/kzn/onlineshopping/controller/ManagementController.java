@@ -21,10 +21,13 @@ import org.springframework.web.servlet.ModelAndView;
 
 import net.kzn.onlineshopping.util.FileUtil;
 import net.kzn.onlineshopping.validator.ProductValidator;
+import net.kzn.onlineshopping.validator.SupplierValidator;
 import net.kzn.shoppingbackend.dao.CategoryDAO;
 import net.kzn.shoppingbackend.dao.ProductDAO;
+import net.kzn.shoppingbackend.dao.SupplierDAO;
 import net.kzn.shoppingbackend.dto.Category;
 import net.kzn.shoppingbackend.dto.Product;
+import net.kzn.shoppingbackend.dto.Supplier;
 
 @Controller
 @RequestMapping("/manage")
@@ -36,7 +39,10 @@ public class ManagementController {
 	private ProductDAO productDAO;
 	
 	@Autowired
-	private CategoryDAO categoryDAO;		
+	private CategoryDAO categoryDAO;
+	
+	@Autowired
+	private SupplierDAO supplierDAO;
 
 	@RequestMapping("/product")
 	public ModelAndView manageProduct(@RequestParam(name="success",required=false)String success) {		
@@ -48,7 +54,7 @@ public class ManagementController {
 		Product nProduct = new Product();
 		
 		// assuming that the user is ADMIN
-		// later we will fixed it based on user is SUPPLIER or ADMIN
+	
 		nProduct.setSupplierId(1);
 		nProduct.setActive(true);
 
@@ -69,6 +75,35 @@ public class ManagementController {
 	}
 
 	
+	@RequestMapping("/supplier")
+	public ModelAndView manageSupplier(@RequestParam(name="success",required=false)String success) {		
+
+		ModelAndView mv = new ModelAndView("page");	
+		mv.addObject("title","Supplier Management");		
+		mv.addObject("userClickManageSupplier",true);
+		
+		Supplier nSupplier = new Supplier();
+		
+		// assuming that the user is ADMIN
+	
+		nSupplier.setSupplierId(1);
+		nSupplier.setActive(true);
+
+		mv.addObject("supplier", nSupplier);
+
+		
+		if(success != null) {
+			if(success.equals("supplier")){
+				mv.addObject("message", "Supplier submitted successfully!");
+			}	
+		
+		}
+			
+		return mv;
+		
+	}
+	
+	
 	@RequestMapping("/{id}/product")
 	public ModelAndView manageProductEdit(@PathVariable int id) {		
 
@@ -85,8 +120,24 @@ public class ManagementController {
 	}
 	
 	
+	@RequestMapping("/{id}/supplier")
+	public ModelAndView manageSupplierEdit(@PathVariable int id) {		
+
+		ModelAndView mv = new ModelAndView("page");	
+		mv.addObject("title","Supplier Management");		
+		mv.addObject("userClickManageSupplier",true);
+		
+		// Product nProduct = new Product();		
+		mv.addObject("supplier", supplierDAO.get(id));
+
+			
+		return mv;
+		
+	}
+	
+	
 	@RequestMapping(value = "/product", method=RequestMethod.POST)
-	public String managePostProduct(@Valid @ModelAttribute("product") Product mProduct, 
+	public String managePost(@Valid @ModelAttribute("product") Product mProduct, 
 			BindingResult results, Model model, HttpServletRequest request) {
 		
 		// mandatory file upload check
@@ -123,6 +174,45 @@ public class ManagementController {
 	}
 
 	
+	
+	@RequestMapping(value = "/supplier", method=RequestMethod.POST)
+	public String managePost(@Valid @ModelAttribute("supplier") Supplier mSupplier, 
+			BindingResult results, Model model, HttpServletRequest request) {
+		
+		// mandatory file upload check
+		if(mSupplier.getId() == 0) {
+			new SupplierValidator().validate(mSupplier, results);
+		}
+		else {
+			// edit check only when the file has been selected
+			if(!mSupplier.getFile().getOriginalFilename().equals("")) {
+				new SupplierValidator().validate(mSupplier, results);
+			}			
+		}
+		
+		if(results.hasErrors()) {
+			model.addAttribute("message", "Validation fails for adding the supplier!");
+			model.addAttribute("userClickManageSupplier",true);
+			return "page";
+		}			
+
+		
+		if(mSupplier.getId() == 0 ) {
+			supplierDAO.add(mSupplier);
+		}
+		else {
+			supplierDAO.update(mSupplier);
+		}
+	
+		 //upload the file
+		 if(!mSupplier.getFile().getOriginalFilename().equals("") ){
+			FileUtil.uploadFile(request, mSupplier.getFile(), mSupplier.getCode()); 
+		 }
+		
+		return "redirect:/manage/supplier?success=supplier";
+	}
+
+	
 	@RequestMapping(value = "/product/{id}/activation", method=RequestMethod.GET)
 	@ResponseBody
 	public String managePostProductActivation(@PathVariable int id) {		
@@ -131,6 +221,16 @@ public class ManagementController {
 		product.setActive(!isActive);
 		productDAO.update(product);		
 		return (isActive)? "Product Dectivated Successfully!": "Product Activated Successfully";
+	}
+			
+	@RequestMapping(value = "/supplier/{id}/activation", method=RequestMethod.GET)
+	@ResponseBody
+	public String managePostSupplierActivation(@PathVariable int id) {		
+		Supplier supplier = supplierDAO.get(id);
+		boolean isActive = supplier.isActive();
+		supplier.setActive(!isActive);
+		supplierDAO.update(supplier);		
+		return (isActive)? "Supplier Disactivated Successfully!": "Supplier Activated Successfully";
 	}
 			
 
