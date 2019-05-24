@@ -16,6 +16,7 @@
 					<div class="panel-body">
 										
 						<sf:form
+						actrion="${contextRoot}/membership"
 							method="POST"
 							modelAttribute="user"
 							class="form-horizontal"
